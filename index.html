@@ -3,12 +3,11 @@
 <head>
     <title></title>
 </head>
-<body>
+<body style="background: #000;">
 
 <canvas id="demoCanvas" width="1000" height="480">
         	alternate crap for junk ass users
 </canvas>
-
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.2.min.js"><\/script>')</script>
@@ -28,6 +27,9 @@
 <script type="text/javascript" src="js/lib/easeljs/filters/BoxBlurFilter.js"></script>
 <script type="text/javascript" src="js/lib/easeljs/filters/ColorMatrixFilter.js"></script>
 <script type="text/javascript" src="js/lib/easeljs/filters/ColorMatrix.js"></script>
+<script type="text/javascript" src="js/lib/easeljs/filters/AlphaMaskFilter.js"></script>
+<script type="text/javascript" src="js/lib/easeljs/ui/Touch.js"></script>
+
 <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/1.10.1/TweenMax.min.js"></script>
 
 <script>
@@ -41,20 +43,30 @@
     var startY = 0;
     var totalRows = 9;
     var totalCols = 9;
-    var paddingX = 32;
-    var paddingY = 32;
+    var wide = 60;
+    var paddingX = wide;
+    var paddingY = wide;
 
     $(document).ready(function() {
         canvas = document.getElementById("demoCanvas");
         stage = new createjs.Stage(canvas);
 
+        //touch events:
+        createjs.Touch.enable(stage);
+
+        //container:
         var container = new createjs.Container();
         stage.addChild(container);
 
+        //Image to solve:
         puzzleImage = new Image();
         puzzleImage.src = "img/jig.jpg";
-        puzzleImage.onload = puzzleLoaded;
         angle = 0;
+
+        //puzzle piece mask:
+        var puzzleTexture2 = new Image();
+        puzzleTexture2.src = "img/puzz.png";
+        puzzleTexture2.onload = puzzleLoaded;
 
         function puzzleLoaded()
         {
@@ -62,57 +74,54 @@
 			var posIdx = 0;
             var rowType = -1;
 
+            //game board:
             for (rowCounter = 0; rowCounter < totalRows; rowCounter++)
 			{
-                for (colCounter = 0; colCounter <  totalCols; colCounter++)
+                for (colCounter = 0; colCounter < totalCols; colCounter++)
                 {
                     //keep track of rows:
                     (rowType >= 2) ? rowType = 0 : rowType++;
-
-                    var shape = new createjs.Shape();
-                    shape.graphics = new createjs.Graphics().beginStroke("rgba(255,255,255,1)").beginBitmapFill(puzzleImage).drawCircle(20, 10, 10).endStroke();
-
+                    //puzzle piece texture:
+                    var puzzleBitmap = new createjs.Bitmap(puzzleTexture2);
+                    //puzzle image bitmap
                     var bitmap = new createjs.Bitmap(puzzleImage);
-                   // bitmap.filters = [new createjs.ColorMatrixFilter(new createjs.ColorMatrix(Math.random(),0,Math.random(),1))];
-                   // bitmap.cache(0, 0, puzzleImage.width, puzzleImage.height)
-                    bitmap.sourceRect = new createjs.Rectangle(startX + startX + (colCounter * paddingX), startY + (rowCounter * paddingY), 30, 30);
-
+                    //create puzzle pieces
+                    bitmap.sourceRect = new createjs.Rectangle(startX + startX + (colCounter * paddingX), startY + (rowCounter * paddingY), wide, wide);
                     bitmap.x = startX + startX + (colCounter * paddingX);
                     bitmap.y = rowCounter * paddingY;
 
-                   // bitmap.mask = shape;
+                    //masking
+                    var amf = new createjs.AlphaMaskFilter(puzzleBitmap.image);
+                    bitmap.filters = [amf];
+                    bitmap.cache(0, 0, wide, wide);
 
-                    // wrapper function to provide scope for the event handlers:
+                    // wrapper function to provide scope for the event handlers for dragging pieces:
                     (function(target) {
                         bitmap.onPress = function(evt) {
                             // bump the target in front of it's siblings:
                             container.addChild(target);
-                            var offset = {x:target.x-evt.stageX, y:target.y-evt.stageY};
+                            var offset = {x : target.x - evt.stageX, y : target.y - evt.stageY};
 
                             // add a handler to the event object's onMouseMove callback
                             // this will be active until the user releases the mouse button:
                             evt.onMouseMove = function(ev) {
-                                target.x = ev.stageX+offset.x;
-                                target.y = ev.stageY+offset.y;
+                                target.x = ev.stageX + offset.x;
+                                target.y = ev.stageY + offset.y;
                                 // indicate that the stage should be updated on the next tick:
                                 update = true;
                             }
                         }
                         bitmap.onMouseOver = function() {
-                            target.scaleX = target.scaleY = target.scale*1.2;
+                            target.scaleX = target.scaleY = target.scale * 1.2;
                             update = true;
                         }
                         bitmap.onMouseOut = function() {
                             target.scaleX = target.scaleY = target.scale;
                             update = true;
                         }
-
                     })(bitmap);
 
-                    stage.addChild( bitmap);
-                    shape.x = bitmap.x;
-                    shape.y = bitmap.y;
-
+                    container.addChild(bitmap);
                     posIdx++;
                 }
 			}
