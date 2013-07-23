@@ -5,7 +5,7 @@
 </head>
 <body>
 
-<canvas id="demoCanvas" width="640" height="480">
+<canvas id="demoCanvas" width="1000" height="480">
         	alternate crap for junk ass users
 </canvas>
 
@@ -37,10 +37,17 @@
     var scale;
 	var angle;
     var puzzleImage;
+    var startX = 0;
+    var startY = 0;
+    var totalRows = 9;
+    var totalCols = 9;
+    var paddingX = 32;
+    var paddingY = 32;
 
     $(document).ready(function() {
         canvas = document.getElementById("demoCanvas");
         stage = new createjs.Stage(canvas);
+
         var container = new createjs.Container();
         stage.addChild(container);
 
@@ -51,63 +58,83 @@
 
         function puzzleLoaded()
         {
+            var colCounter = 0;
+			var posIdx = 0;
+            var rowType = -1;
 
-            // masks can only be shapes.
-            star = new createjs.Shape();
-            // the mask's position will be relative to the parent of its target:
-            star.x = puzzleImage.width / 2;
-            star.y = puzzleImage.height / 2;
-            // only the drawPolyStar call is needed for the mask to work:
-            star.graphics.beginStroke("#FF9900").setStrokeStyle(5).drawPolyStar(0 ,0, puzzleImage.height / 2 - 15, 5, 0.6).closePath();
+            for (rowCounter = 0; rowCounter < totalRows; rowCounter++)
+			{
+                for (colCounter = 0; colCounter <  totalCols; colCounter++)
+                {
+                    //keep track of rows:
+                    (rowType >= 2) ? rowType = 0 : rowType++;
 
+                    var shape = new createjs.Shape();
+                    shape.graphics = new createjs.Graphics().beginStroke("rgba(255,255,255,1)").beginBitmapFill(puzzleImage).drawCircle(20, 10, 10).endStroke();
 
-            var bitmap = new createjs.Bitmap(puzzleImage);
-            // blur and desaturate the background image:
-           // bitmap.filters = [new createjs.BoxBlurFilter(20, 20, 20), new createjs.ColorMatrixFilter(new createjs.ColorMatrix(0,0,-100,0))];
-           // bitmap.cache(0, 0, puzzleImage.width, puzzleImage.height);
+                    var bitmap = new createjs.Bitmap(puzzleImage);
+                   // bitmap.filters = [new createjs.ColorMatrixFilter(new createjs.ColorMatrix(Math.random(),0,Math.random(),1))];
+                   // bitmap.cache(0, 0, puzzleImage.width, puzzleImage.height)
+                    bitmap.sourceRect = new createjs.Rectangle(startX + startX + (colCounter * paddingX), startY + (rowCounter * paddingY), 30, 30);
 
+                    bitmap.x = startX + startX + (colCounter * paddingX);
+                    bitmap.y = rowCounter * paddingY;
 
-            container.addChild(bitmap);
+                   // bitmap.mask = shape;
 
+                    // wrapper function to provide scope for the event handlers:
+                    (function(target) {
+                        bitmap.onPress = function(evt) {
+                            // bump the target in front of it's siblings:
+                            container.addChild(target);
+                            var offset = {x:target.x-evt.stageX, y:target.y-evt.stageY};
 
-           // var bmp = new createjs.Bitmap(puzzleImage);
-		   // container.addChild(bmp);
-		   // bmp.mask = star;
+                            // add a handler to the event object's onMouseMove callback
+                            // this will be active until the user releases the mouse button:
+                            evt.onMouseMove = function(ev) {
+                                target.x = ev.stageX+offset.x;
+                                target.y = ev.stageY+offset.y;
+                                // indicate that the stage should be updated on the next tick:
+                                update = true;
+                            }
+                        }
+                        bitmap.onMouseOver = function() {
+                            target.scaleX = target.scaleY = target.scale*1.2;
+                            update = true;
+                        }
+                        bitmap.onMouseOut = function() {
+                            target.scaleX = target.scaleY = target.scale;
+                            update = true;
+                        }
 
+                    })(bitmap);
 
+                    stage.addChild( bitmap);
+                    shape.x = bitmap.x;
+                    shape.y = bitmap.y;
 
-            //Mask
-           /* var shape = new createjs.Shape();
-            shape.graphics = new createjs.Graphics().beginStroke("rgba(255,255,255,1)").beginBitmapFill(puzzleImage).drawCircle(90, 90, 20).endStroke();
-            shape.x = puzzleImage.width / 2;
-            shape.y = puzzleImage.height / 2;
-            var image = new createjs.Bitmap(puzzleImage);
-            image.mask = shape;
-
-            container.addChild(image);*/
-
-
-            stage.update();
-
-
-
-           // container.addChild(star);
-            //createjs.Ticker.addEventListener("tick", tick);
-
-
+                    posIdx++;
+                }
+			}
+            createjs.Ticker.addEventListener("tick", tick);
         }
 
         function tick(event)
         {
-            star.rotation += 5;
-            star.scaleX = star.scaleY = 0.5 + Math.sin(angle);
             stage.update(event);
-            angle += 0.025;
+             /* var ctx = stage.canvas.getContext("2d");
+            ctx.save();
+
+            ctx.drawImage(puzzleImage, 90, 130, 50, 60, 10, 10, 50, 60)
+
+            //container.addChild(bitmap);
+
+
+            $(ctx).on("click", function(e){
+                console.log("sdf")
+            })*/
 	    }
-
     });
-
-
 
 </script>
 
