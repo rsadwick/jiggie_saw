@@ -5,5 +5,111 @@
 </head>
 <body>
 
+<canvas id="demoCanvas" width="640" height="480">
+        	alternate crap for junk ass users
+</canvas>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.2.min.js"><\/script>')</script>
+<script type="text/javascript" src="js/lib/easeljs/utils/UID.js"></script>
+<script type="text/javascript" src="js/lib/easeljs/geom/Matrix2D.js"></script>
+<script type="text/javascript" src="js/lib/easeljs/events/EventDispatcher.js"></script>
+<script type="text/javascript" src="js/lib/easeljs/display/DisplayObject.js"></script>
+<script type="text/javascript" src="js/lib/easeljs/display/Container.js"></script>
+<script type="text/javascript" src="js/lib/easeljs/display/Stage.js"></script>
+<script type="text/javascript" src="js/lib/easeljs/events/MouseEvent.js"></script>
+<script type="text/javascript" src="js/lib/easeljs/display/Bitmap.js"></script>
+<script type="text/javascript" src="js/lib/easeljs/display/Graphics.js"></script>
+<script type="text/javascript" src="js/lib/easeljs/display/Shape.js"></script>
+<script type="text/javascript" src="js/lib/easeljs/geom/Rectangle.js"></script>
+<script type="text/javascript" src="js/lib/easeljs/utils/Ticker.js"></script>
+<script type="text/javascript" src="js/lib/easeljs/filters/Filter.js"></script>
+<script type="text/javascript" src="js/lib/easeljs/filters/BoxBlurFilter.js"></script>
+<script type="text/javascript" src="js/lib/easeljs/filters/ColorMatrixFilter.js"></script>
+<script type="text/javascript" src="js/lib/easeljs/filters/ColorMatrix.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/1.10.1/TweenMax.min.js"></script>
+
+<script>
+
+    var canvas, stage, star
+
+    var scale;
+	var angle;
+    var puzzleImage;
+
+    $(document).ready(function() {
+        canvas = document.getElementById("demoCanvas");
+        stage = new createjs.Stage(canvas);
+        var container = new createjs.Container();
+        stage.addChild(container);
+
+        puzzleImage = new Image();
+        puzzleImage.src = "img/jig.jpg";
+        puzzleImage.onload = puzzleLoaded;
+        angle = 0;
+
+        function puzzleLoaded()
+        {
+
+            // masks can only be shapes.
+            star = new createjs.Shape();
+            // the mask's position will be relative to the parent of its target:
+            star.x = puzzleImage.width / 2;
+            star.y = puzzleImage.height / 2;
+            // only the drawPolyStar call is needed for the mask to work:
+            star.graphics.beginStroke("#FF9900").setStrokeStyle(5).drawPolyStar(0 ,0, puzzleImage.height / 2 - 15, 5, 0.6).closePath();
+
+
+            var bitmap = new createjs.Bitmap(puzzleImage);
+            // blur and desaturate the background image:
+           // bitmap.filters = [new createjs.BoxBlurFilter(20, 20, 20), new createjs.ColorMatrixFilter(new createjs.ColorMatrix(0,0,-100,0))];
+           // bitmap.cache(0, 0, puzzleImage.width, puzzleImage.height);
+
+
+            container.addChild(bitmap);
+
+
+           // var bmp = new createjs.Bitmap(puzzleImage);
+		   // container.addChild(bmp);
+		   // bmp.mask = star;
+
+
+
+            //Mask
+           /* var shape = new createjs.Shape();
+            shape.graphics = new createjs.Graphics().beginStroke("rgba(255,255,255,1)").beginBitmapFill(puzzleImage).drawCircle(90, 90, 20).endStroke();
+            shape.x = puzzleImage.width / 2;
+            shape.y = puzzleImage.height / 2;
+            var image = new createjs.Bitmap(puzzleImage);
+            image.mask = shape;
+
+            container.addChild(image);*/
+
+
+            stage.update();
+
+
+
+           // container.addChild(star);
+            //createjs.Ticker.addEventListener("tick", tick);
+
+
+        }
+
+        function tick(event)
+        {
+            star.rotation += 5;
+            star.scaleX = star.scaleY = 0.5 + Math.sin(angle);
+            stage.update(event);
+            angle += 0.025;
+	    }
+
+    });
+
+
+
+</script>
+
 </body>
 </html>
