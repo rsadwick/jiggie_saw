@@ -3,14 +3,12 @@
 <head>
     <title></title>
 </head>
-<body style="background: #000;">
+<body onLoad="init();" style="background: #ff9900;">
 
 <canvas id="demoCanvas" width="1000" height="480">
         	alternate crap for junk ass users
 </canvas>
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.2.min.js"><\/script>')</script>
 <script type="text/javascript" src="js/lib/easeljs/utils/UID.js"></script>
 <script type="text/javascript" src="js/lib/easeljs/geom/Matrix2D.js"></script>
 <script type="text/javascript" src="js/lib/easeljs/events/EventDispatcher.js"></script>
@@ -20,6 +18,7 @@
 <script type="text/javascript" src="js/lib/easeljs/events/MouseEvent.js"></script>
 <script type="text/javascript" src="js/lib/easeljs/display/Bitmap.js"></script>
 <script type="text/javascript" src="js/lib/easeljs/display/Graphics.js"></script>
+<script type="text/javascript" src="js/lib/easeljs/display/Shadow.js"></script>
 <script type="text/javascript" src="js/lib/easeljs/display/Shape.js"></script>
 <script type="text/javascript" src="js/lib/easeljs/geom/Rectangle.js"></script>
 <script type="text/javascript" src="js/lib/easeljs/utils/Ticker.js"></script>
@@ -34,20 +33,20 @@
 
 <script>
 
-    var canvas, stage, star
+    var canvas, stage;
 
     var scale;
 	var angle;
     var puzzleImage;
     var startX = 0;
     var startY = 0;
-    var totalRows = 9;
-    var totalCols = 9;
+    var totalRows = 5;
+    var totalCols = 5;
     var wide = 60;
     var paddingX = wide;
     var paddingY = wide;
 
-    $(document).ready(function() {
+    function init(){
         canvas = document.getElementById("demoCanvas");
         stage = new createjs.Stage(canvas);
 
@@ -60,12 +59,14 @@
 
         //Image to solve:
         puzzleImage = new Image();
-        puzzleImage.src = "img/jig.jpg";
+        puzzleImage.src = "img/zelda.jpg";
         angle = 0;
 
         //puzzle piece mask:
         var puzzleTexture2 = new Image();
         puzzleTexture2.src = "img/puzz.png";
+        puzzleTexture2.width = 200;
+        puzzleTexture2.height = 200;
         puzzleTexture2.onload = puzzleLoaded;
 
         function puzzleLoaded()
@@ -83,6 +84,9 @@
                     (rowType >= 2) ? rowType = 0 : rowType++;
                     //puzzle piece texture:
                     var puzzleBitmap = new createjs.Bitmap(puzzleTexture2);
+                    puzzleBitmap.width = 200;
+                    puzzleBitmap.height = 200;
+
                     //puzzle image bitmap
                     var bitmap = new createjs.Bitmap(puzzleImage);
                     //create puzzle pieces
@@ -93,7 +97,8 @@
                     //masking
                     var amf = new createjs.AlphaMaskFilter(puzzleBitmap.image);
                     bitmap.filters = [amf];
-                    bitmap.cache(0, 0, wide, wide);
+                    bitmap.cache(0, 0, puzzleBitmap.width, puzzleBitmap.height);
+                    bitmap.shadow = new createjs.Shadow("#000000", 2, 2, 5);
 
                     // wrapper function to provide scope for the event handlers for dragging pieces:
                     (function(target) {
@@ -143,7 +148,7 @@
                 console.log("sdf")
             })*/
 	    }
-    });
+    }
 
 </script>
 
