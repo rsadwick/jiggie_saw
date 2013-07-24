@@ -5,10 +5,10 @@
 </head>
 <body onLoad="init();" style="background: #ff9900;">
 
-<canvas id="demoCanvas" width="1000" height="480">
+<canvas id="demoCanvas" width="1100" height="1100">
         	alternate crap for junk ass users
 </canvas>
-
+<script type="text/javascript" src="js/lib/preloadjs.js"></script>
 <script type="text/javascript" src="js/lib/easeljs/utils/UID.js"></script>
 <script type="text/javascript" src="js/lib/easeljs/geom/Matrix2D.js"></script>
 <script type="text/javascript" src="js/lib/easeljs/events/EventDispatcher.js"></script>
@@ -40,11 +40,17 @@
     var puzzleImage;
     var startX = 0;
     var startY = 0;
-    var totalRows = 5;
-    var totalCols = 5;
-    var wide = 60;
-    var paddingX = wide;
-    var paddingY = wide;
+    var totalRows = 4;
+    var totalCols = 4;
+  //  var wide = 130;
+    var paddingX = 200;
+    var paddingY = 200;
+
+    var board = [];
+
+    var assets = [];
+
+
 
     function init(){
         canvas = document.getElementById("demoCanvas");
@@ -57,48 +63,301 @@
         var container = new createjs.Container();
         stage.addChild(container);
 
+
+
         //Image to solve:
         puzzleImage = new Image();
         puzzleImage.src = "img/zelda.jpg";
-        angle = 0;
+
+         manifest = [
+            {src:"img/pieces/bottom_corner.png", id:"img1"},
+            {src:"img/pieces/bottom_middle1.png", id:"img2"},
+            {src:"img/pieces/bottom_middle2.png", id:"img3"},
+            {src:"img/pieces/left_border2.png", id:"img4"},
+            {src:"img/pieces/left_border3.png", id:"img5"},
+            {src:"img/pieces/left_border4.png", id:"img6"},
+            {src:"img/pieces/middle_1.png", id:"img7"},
+            {src:"img/pieces/middle_2.png", id:"img8"},
+            {src:"img/pieces/middle_3.png", id:"img9"},
+            {src:"img/pieces/middle_4.png", id:"img10"},
+            {src:"img/pieces/right_corner2.png", id:"img11"},
+            {src:"img/pieces/top_1.png", id:"img12"},
+            {src:"img/pieces/top_2.png", id:"img13"},
+            {src:"img/pieces/top_left_corner.png", id:"img14"},
+            {src:"img/pieces/top_right_corner.png", id:"img15"},
+
+        ];
+
+    loader = new createjs.LoadQueue(false);
+            loader.onFileLoad = handleFileLoad;
+            loader.onComplete = puzzleLoaded;
+            loader.loadManifest(manifest);
+
+
+    function handleFileLoad(event) {
+			assets.push(event.item);
+		}
+
+        var piece1 = {
+            image: "img/pieces/top_left_corner.png",
+            rotation: 0,
+            row: 0,
+            column: 0,
+            width: 205,
+            height: 164
+        }
+
+
+         var piece2 = {
+            image: "img/pieces/top_1.png",
+            rotation: 0,
+            row: 0,
+            column: 1,
+            width: 199,
+            height: 202
+       }
+
+          var piece3 = {
+            image: "img/pieces/top_2.png",
+            rotation: 0,
+            row: 0,
+            column: 2,
+            width: 202,
+            height: 202
+       }
+
+        var piece4 = {
+            image: "img/pieces/top_right_corner.png",
+            rotation: 0,
+            row: 0,
+            column: 3,
+            width: 161,
+            height: 203
+        }
+
+        var piece5 =  {
+            image: "img/pieces/left_border2.png",
+            rotation: 0,
+            row: 1,
+            column: 0,
+            width: 203,
+            height: 200
+        }
+
+        var  piece6 = {
+            image: "img/pieces/middle_1.png",
+            rotation: 0,
+            row: 1,
+            column: 1,
+            width: 159,
+            height: 201
+       }
+
+
+         var  piece7 = {
+            image: "img/pieces/middle_3.png",
+            rotation: 0,
+            row: 1,
+            column: 2,
+            width: 200,
+            height: 159
+       }
+
+          var piece8 = {
+            image: "img/pieces/right_corner2.png",
+            rotation: 0,
+            row: 1,
+            column: 3,
+            width: 202,
+            height: 199
+       }
+
+
+
+        //next
+
+        var piece9 =  {
+            image: "img/pieces/left_border3.png",
+            rotation: 0,
+            row: 2,
+            column: 0,
+            width: 201,
+            height: 200
+        }
+
+        var piece10 =  {
+            image: "img/pieces/middle_2.png",
+            rotation: 0,
+            row: 2,
+            column: 1,
+            width: 200,
+            height: 158
+        }
+
+         var  piece11 = {
+            image: "img/pieces/middle_4.png",
+            rotation: 0,
+            row: 2,
+            column: 2,
+            width: 159,
+            height: 200
+       }
+
+         var  piece12 = {
+            image: "img/pieces/right_corner2.png",
+            rotation: 0,
+            row: 2,
+            column: 3,
+            width: 202,
+            height: 199
+       }
+
+         var piece13 = {
+            image: "img/pieces/left_border4.png",
+            rotation: 0,
+            row: 3,
+            column: 0,
+            width: 161,
+            height: 202
+        }
+
+         var piece14 = {
+            image: "img/pieces/bottom_middle1.png",
+            rotation: 0,
+            row: 3,
+            column: 1,
+            width: 200,
+            height: 202
+        }
+
+         var piece15 = {
+            image: "img/pieces/bottom_middle2.png",
+            rotation: 0,
+            row: 3,
+            column: 2,
+            width: 201,
+            height: 202
+        }
+
+         var  piece16 =  {
+            image: "img/pieces/bottom_corner.png",
+            rotation: 0,
+            row: 3,
+            column: 3,
+             width: 203,
+            height: 161
+       }
+
+
+        board.push(piece1, piece2, piece3, piece4, piece5, piece6, piece7, piece8, piece9, piece10, piece11, piece12, piece13, piece14, piece15, piece16)
+        console.log(board.length);
+
 
         //puzzle piece mask:
-        var puzzleTexture2 = new Image();
-        puzzleTexture2.src = "img/puzz.png";
-        puzzleTexture2.width = 200;
-        puzzleTexture2.height = 200;
-        puzzleTexture2.onload = puzzleLoaded;
+       /* var top_left = new Image();
+        top_left.src = board.top_left.image;
+
+        var top_right = new Image();
+        top_right.src = board.top_right.image;
+
+        var middle = new Image();
+        middle.src = board.middle.image;
+
+        var bottom_right = new Image();
+        bottom_right.src = board.bottom_right.image;
+
+        var bottom_left = new Image();
+        bottom_left.src = board.bottom_left.image;
+        bottom_left.onload = puzzleLoaded;*/
+
 
         function puzzleLoaded()
         {
             var colCounter = 0;
 			var posIdx = 0;
             var rowType = -1;
-
+            var puzzleBitmap;
             //game board:
+
+            console.log(assets)
+
             for (rowCounter = 0; rowCounter < totalRows; rowCounter++)
 			{
+
                 for (colCounter = 0; colCounter < totalCols; colCounter++)
                 {
-                    //keep track of rows:
-                    (rowType >= 2) ? rowType = 0 : rowType++;
-                    //puzzle piece texture:
-                    var puzzleBitmap = new createjs.Bitmap(puzzleTexture2);
-                    puzzleBitmap.width = 200;
-                    puzzleBitmap.height = 200;
 
+                     if(rowCounter == board[posIdx].row && colCounter == board[posIdx].column)
+                        {
+                            console.log(rowCounter, colCounter, posIdx)
+                            puzzleBitmap = new createjs.Bitmap(board[posIdx].image);
+                            puzzleBitmap.width = 140;
+                            puzzleBitmap.height = 140;
+                            paddingX = 140;
+                            paddingY =  140;
+                        }
+
+
+                    // console.log(rowCounter, colCounter, board[posIdx])
+
+                    //top left corner
+                   /* if(rowCounter == board.top_left.row && colCounter == board.top_left.column)
+                    {
+                        puzzleBitmap = new createjs.Bitmap(top_left);
+                        puzzleBitmap.width = top_left.width;
+                        puzzleBitmap.height = top_left.height;
+                    }
+                    //top right corner
+                    else if(rowCounter == board.top_right.row && colCounter == board.top_right.column)
+                    {
+                        puzzleBitmap = new createjs.Bitmap(top_right);
+                        puzzleBitmap.width = top_right.width;
+                        puzzleBitmap.height = top_right.height;
+                    }
+
+                    //bottom left corner
+                    else if(rowCounter == board.bottom_left.row && colCounter == board.bottom_left.column )
+                    {
+                        console.log(rowCounter, board.bottom_left.row, colCounter,board.bottom_left.column)
+                        puzzleBitmap = new createjs.Bitmap(bottom_left);
+                        puzzleBitmap.width = bottom_left.width;
+                        puzzleBitmap.height = bottom_left.height;
+                        console.log(puzzleBitmap.width, puzzleBitmap.height)
+                    }
+
+                    //bottom right corner
+                    else if(rowCounter == board.bottom_right.row && colCounter == board.bottom_right.row )
+                    {
+
+                        puzzleBitmap = new createjs.Bitmap(bottom_right);
+                        puzzleBitmap.width = bottom_right.width;
+                        puzzleBitmap.height = bottom_right.height;
+                    }
+
+                    else
+                    {
+                        puzzleBitmap = new createjs.Bitmap(middle);
+                        puzzleBitmap.width = middle.width;
+                        puzzleBitmap.height = middle.height;
+
+                    }
+
+                    console.log(colCounter, totalCols, rowCounter, totalRows)*/
+                   // paddingX = puzzleBitmap.width;
+                   // paddingY = puzzleBitmap.height;
                     //puzzle image bitmap
                     var bitmap = new createjs.Bitmap(puzzleImage);
                     //create puzzle pieces
-                    bitmap.sourceRect = new createjs.Rectangle(startX + startX + (colCounter * paddingX), startY + (rowCounter * paddingY), wide, wide);
+                    console.log(colCounter * paddingX, rowCounter * paddingY)
+                    bitmap.sourceRect = new createjs.Rectangle(colCounter * paddingX, rowCounter * paddingY,  puzzleBitmap.width,  puzzleBitmap.height);
                     bitmap.x = startX + startX + (colCounter * paddingX);
                     bitmap.y = rowCounter * paddingY;
 
                     //masking
                     var amf = new createjs.AlphaMaskFilter(puzzleBitmap.image);
                     bitmap.filters = [amf];
-                    bitmap.cache(0, 0, puzzleBitmap.width, puzzleBitmap.height);
-                    bitmap.shadow = new createjs.Shadow("#000000", 2, 2, 5);
+                  //  bitmap.cache(0, 0,  puzzleBitmap.width,  puzzleBitmap.height);
+                 //   bitmap.shadow = new createjs.Shadow("#000000", 2, 2, 5);
 
                     // wrapper function to provide scope for the event handlers for dragging pieces:
                     (function(target) {
