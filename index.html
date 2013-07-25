@@ -5,7 +5,7 @@
 </head>
 <body onLoad="init();" style="background: #ff9900;">
 
-<canvas id="demoCanvas" width="1100" height="1100">
+<canvas id="demoCanvas" width="1500" height="1500">
         	alternate crap for junk ass users
 </canvas>
 <script type="text/javascript" src="js/lib/preloadjs.js"></script>
@@ -38,14 +38,15 @@
     var puzzleImage;
     var startX = 0;
     var startY = 0;
-    var totalRows = 6;
-    var totalCols = 6;
+    var totalRows = 3;
+    var totalCols = 3;
   //  var wide = 130;
     var paddingX = 100;
     var paddingY = 100;
 
     var board = [];
     var assets = [];
+     var piecesArray = [];
 
     function init(){
         canvas = document.getElementById("demoCanvas");
@@ -58,18 +59,192 @@
         var container = new createjs.Container();
         stage.addChild(container);
 
+
+        var horizontalPieces = 5;
+        var verticalPieces = 4;
+
+
         //Image to solve:
         puzzleImage = new Image();
         puzzleImage.src = "img/zelda.jpg";
         puzzleImage.onload  = puzzleLoaded;
 
+
         function puzzleLoaded()
         {
-            var colCounter = 0;
-			var posIdx = 0;
 
+            var imageWidth = puzzleImage.width;
+            var imageHeight = puzzleImage.height;
+
+            var pieceWidth = Math.round(imageWidth / horizontalPieces);
+            var pieceHeight = Math.round(imageHeight / verticalPieces);
+
+            for(var i = 0; i< horizontalPieces; i++){
+     		    piecesArray[i] = [];
+
+                for(j = 0; j < verticalPieces; j++){
+                    piecesArray[i][j] = {};
+                    piecesArray[i][j].right = Math.floor(Math.random() * 2);
+                    piecesArray[i][j].down = Math.floor(Math.random() * 2);
+                    if( j > 0){
+                        piecesArray[i][j].up = 1 - piecesArray[i][j-1].down;
+                    }
+                    if(i > 0){
+                        piecesArray[i][j].left = 1 - piecesArray[i-1][j].right;
+                    }
+
+                    var x8 = Math.round(pieceWidth / 8);
+                    var y8 = Math.round(pieceHeight / 8);
+
+                    //begin drawing puzzle shapes:
+                    var context = new createjs.Shape();
+                    context.graphics.beginStroke("#f00");
+                    context.graphics.setStrokeStyle(4, 1, 1);
+                    //context.graphics.beginFill("#fff");
+
+                    context.graphics.moveTo(0, 0);
+
+                    if(j != 0){
+
+                        context.graphics.lineTo(3 * x8, 0);
+                        if(piecesArray[i][j].up == 1){
+
+                            context.graphics.quadraticCurveTo(2 * x8, -2 * y8, 4 * x8, -2 * y8);
+                            context.graphics.quadraticCurveTo(6 * x8, -2 * y8, 5 * x8, 0);
+
+
+                        }
+                        else{
+                            context.graphics.quadraticCurveTo(2 * x8, 2 * y8, 4 * x8, 2 * y8);
+                            context.graphics.quadraticCurveTo(6 * x8, 2 * y8 ,5 * x8, 0);
+                        }
+					}
+
+                    context.graphics.lineTo(8 * x8, 0);
+
+                    if(i != horizontalPieces - 1){
+
+                        context.graphics.lineTo(8 * x8, 3 * y8);
+
+                        if(piecesArray[i][j].right == 1){
+                            context.graphics.quadraticCurveTo(10 * x8,2 * y8,10 * x8,4 * y8);
+                            context.graphics.quadraticCurveTo(10 * x8, 6 * y8, 8 * x8, 5 * y8);
+                        }
+                        else{
+
+                            context.graphics.quadraticCurveTo(6 * x8, 2 * y8, 6 * x8, 4 * y8);
+                            context.graphics.quadraticCurveTo(6 * x8, 6 * y8, 8 * x8, 5 * y8);
+
+                        }
+
+				    }
+
+                    context.graphics.lineTo(8 * x8, 8 * y8);
+
+
+                    if(j != verticalPieces -1){
+
+                        context.graphics.lineTo( 5 *x8 ,8 * y8);
+                        if(piecesArray[i][j].down == 1){
+                            context.graphics.quadraticCurveTo(6 * x8, 10 * y8, 4 * x8 ,10 * y8);
+                            context.graphics.quadraticCurveTo(2 * x8, 10 * y8, 3 * x8, 8 * y8);
+
+                        }
+                        else{
+
+                            context.graphics.quadraticCurveTo(6 * x8, 6 * y8, 4 * x8, 6 * y8);
+                            context.graphics.quadraticCurveTo(2 *x8, 6 * y8, 3 * x8, 8 * y8);
+
+
+                        }
+
+                    }
+
+                    context.graphics.lineTo(0, 8 * y8);
+                    if(i != 0){
+
+                        context.graphics.lineTo(0, 5 * y8);
+                        if(piecesArray[i][j].left == 1){
+
+                            context.graphics.quadraticCurveTo(-2 * x8, 6 * y8, -2 * x8, 4 * y8);
+                            context.graphics.quadraticCurveTo(-2 * x8, 2 * y8, 0, 3 * y8);
+
+                          }
+                          else{
+                            context.graphics.quadraticCurveTo(2 * x8, 6 * y8, 2 * x8, 4 * y8);
+                            context.graphics.quadraticCurveTo(2 * x8, 2 * y8, 0, 3 * y8);
+
+
+                        }
+                    }
+                    context.graphics.lineTo(0, 0);
+
+
+                     //chop up image:
+                    var bitmap = new createjs.Bitmap(puzzleImage);
+                    bitmap.sourceRect = new createjs.Rectangle( pieceWidth * i + pieceWidth / 2, pieceHeight * j + pieceHeight / 2,  pieceWidth, pieceHeight);
+                    bitmap.x = pieceWidth * i + pieceWidth / 2;
+                    bitmap.y = pieceHeight * j + pieceHeight / 2;
+
+
+                    context.x = pieceWidth * i + pieceWidth / 2;
+                    context.y = pieceHeight * j + pieceHeight / 2;
+                    context.cache(0, 0, pieceWidth, pieceHeight);
+
+
+                    //masking
+                    var amf = new createjs.AlphaMaskFilter(context.cacheCanvas);
+                    bitmap.filters = [amf];
+                    bitmap.cache(0, 0, pieceWidth, pieceHeight);
+
+
+                    container.addChild(context);
+                    container.addChild(bitmap);
+
+
+
+                    // wrapper function to provide scope for the event handlers for dragging pieces:
+                    (function(target) {
+                        bitmap.onPress = function(evt) {
+                            // bump the target in front of it's siblings:
+                            container.addChild(target);
+                            var offset = {x : target.x - evt.stageX, y : target.y - evt.stageY};
+
+                            // add a handler to the event object's onMouseMove callback
+                            // this will be active until the user releases the mouse button:
+                            evt.onMouseMove = function(ev) {
+                                target.x = ev.stageX + offset.x;
+                                target.y = ev.stageY + offset.y;
+                                // indicate that the stage should be updated on the next tick:
+                                update = true;
+                            }
+                        }
+                        bitmap.onMouseOver = function() {
+                            target.scaleX = target.scaleY = target.scale * 1.2;
+                            update = true;
+                        }
+                        bitmap.onMouseOut = function() {
+                            target.scaleX = target.scaleY = target.scale;
+                            update = true;
+                        }
+                    })(bitmap);
+
+
+                    // container.addChild(context)
+
+
+                }
+            }
+
+             //container.addChild(bitmap);
+            createjs.Ticker.addEventListener("tick", tick);
+
+
+
+
+            /* ENDING */
             //game board:
-            for (rowCounter = 0; rowCounter < totalRows; rowCounter++)
+            /*for (rowCounter = 0; rowCounter < totalRows; rowCounter++)
 			{
                 for (colCounter = 0; colCounter < totalCols; colCounter++)
                 {
@@ -103,7 +278,7 @@
                     piece.graphics.quadraticCurveTo(2*x8,6*y8,2*x8,4*y8);
 					piece.graphics.quadraticCurveTo(2*x8,2*y8,0,3*y8);
                     piece.graphics.lineTo(0,0);
-                    piece.graphics.beginFill();
+                    piece.graphics.endFill();
 
                     piece.cache(0, 0, paddingX, paddingY);
 
@@ -143,7 +318,9 @@
                 }
 			}
             createjs.Ticker.addEventListener("tick", tick);
+        }*/
         }
+
 
         function tick(event)
         {
